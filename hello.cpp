@@ -1,3 +1,4 @@
+//contibuted by mallikarjun
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -89,7 +90,6 @@ public:
         }
     }
 
-    // ✅ CONTRIBUTION: Delete Student by ID
     void deleteStudentById(int deleteId) {
         auto it = remove_if(students.begin(), students.end(), [deleteId](const Student& s) {
             return s.id == deleteId;
@@ -113,6 +113,11 @@ public:
 
     void loadFromFile() {
         ifstream inFile(filename);
+        if (!inFile.is_open()) {
+            cerr << "Warning: " << filename << " not found. Starting with an empty record.\n";
+            return;
+        }
+
         students.clear();
         string line;
 
@@ -122,16 +127,19 @@ public:
 
             // Parse ID
             pos = line.find(',');
+            if (pos == string::npos) continue;
             s.id = stoi(line.substr(0, pos));
             line.erase(0, pos + 1);
 
             // Parse Name
             pos = line.find(',');
+            if (pos == string::npos) continue;
             s.name = line.substr(0, pos);
             line.erase(0, pos + 1);
 
             // Parse Age
             pos = line.find(',');
+            if (pos == string::npos) continue;
             s.age = stoi(line.substr(0, pos));
             line.erase(0, pos + 1);
 
@@ -153,10 +161,18 @@ int main() {
         cout << "1. Add Student\n";
         cout << "2. Display All Students\n";
         cout << "3. Search Student by ID\n";
-        cout << "4. Exit\n";
-        cout << "5. Delete Student by ID\n"; // ✅ New Menu Option
+        cout << "4. Delete Student by ID\n";
+        cout << "5. Exit\n";
         cout << "Enter your choice: ";
+
         cin >> choice;
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. Please enter a number.\n";
+            continue;
+        }
 
         switch(choice) {
             case 1:
@@ -172,20 +188,20 @@ int main() {
                 manager.searchById(id);
                 break;
             }
-            case 4:
-                cout << "Exiting the program.\n";
-                break;
-            case 5: {
+            case 4: {
                 int id;
                 cout << "Enter ID to delete: ";
                 cin >> id;
                 manager.deleteStudentById(id);
                 break;
             }
+            case 5:
+                cout << "Exiting the program.\n";
+                break;
             default:
                 cout << "Invalid choice. Please try again.\n";
         }
-    } while (choice != 4);
+    } while (choice != 5);
 
     return 0;
 }
